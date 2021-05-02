@@ -1,30 +1,27 @@
 package com.example.practicecompose
 
-import android.annotation.SuppressLint
-import android.icu.text.CaseMap
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -33,12 +30,15 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.practicecompose.ui.theme.PracticeComposeTheme
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
@@ -48,25 +48,86 @@ class MainActivity : ComponentActivity() {
             Font(R.font.gotan_ultra_bold)
         )
         setContent {
-            // ShowImage()
-            // TextStyling(fontFamily = fontFamily)
-            Column(Modifier.fillMaxSize()) {
-                val color =  remember {
-                    mutableStateOf(Color.Yellow)
-                }
-
-                ColorBox(Modifier.weight(1f).fillMaxSize()){
-                    color.value = it
-                }
-                Box(modifier = Modifier
-                    .background(color.value)
-                    .weight(1f)
-                    .fillMaxSize()
-                )
-            }
-
-
+            ShowContent()
         }
+    }
+}
+
+@Composable
+fun ShowContent() {
+    //ShowImage()
+    //TextStyling(fontFamily = fontFamily)
+    //ShowColorBoxs()
+    GreetMe()
+}
+
+@Composable
+fun GreetMe() {
+    val scaffoldState = rememberScaffoldState()
+    var textFieldState by remember{
+        mutableStateOf("")
+    }
+    val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        scaffoldState = scaffoldState
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 30.dp)
+        ) {
+            TextField(
+                value = textFieldState,
+                label = {
+                   Text("Enter your name")
+                },
+                onValueChange = { it ->
+                    textFieldState = it
+                },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                keyboardActions = KeyboardActions(onDone = {focusManager.clearFocus()}),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done,keyboardType = KeyboardType.Text)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                scope.launch {
+                    scaffoldState.snackbarHostState.showSnackbar("Hello $textFieldState")
+                }
+                focusManager.clearFocus()
+            }) {
+                Text(text = "Pls greet me")
+            }
+        }
+    }
+}
+
+@Composable
+fun ShowColorBoxs() {
+    Column(Modifier.fillMaxSize()) {
+        val color = remember {
+            mutableStateOf(Color.Yellow)
+        }
+
+        ColorBox(
+            Modifier
+                .weight(1f)
+                .fillMaxSize()
+        ) {
+            color.value = it
+        }
+        Box(
+            modifier = Modifier
+                .background(color.value)
+                .weight(1f)
+                .fillMaxSize()
+        )
     }
 }
 
@@ -74,17 +135,17 @@ class MainActivity : ComponentActivity() {
 fun ColorBox(
     modifier: Modifier = Modifier,
     updateColor: (Color) -> Unit
-){
+) {
     Box(modifier = modifier
         .background(color = Color.Red)
         .clickable {
             updateColor(
                 Color(
-                Random.nextFloat(),
-                Random.nextFloat(),
-                Random.nextFloat(),
-                1f
-            )
+                    Random.nextFloat(),
+                    Random.nextFloat(),
+                    Random.nextFloat(),
+                    1f
+                )
             )
         }
     )
@@ -190,6 +251,6 @@ fun ImageCard(
 @Composable
 fun DefaultPreview() {
     PracticeComposeTheme {
-        ShowImage()
+        ShowContent()
     }
 }
