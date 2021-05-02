@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ComposeTraining.iml" filepath="$PROJECT_DIR$/.idea/modules/ComposeTraining.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/PracticeCompose.iml" filepath="$PROJECT_DIR$/.idea/modules/PracticeCompose.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/PracticeCompose.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/PracticeCompose.app.iml" />
     </modules>
   </component>
 </project>
