@@ -2,6 +2,7 @@ package com.example.practicecompose
 
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
@@ -16,11 +17,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -38,6 +40,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+
 import com.example.practicecompose.ui.theme.PracticeComposeTheme
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -60,13 +64,49 @@ fun ShowContent() {
     //TextStyling(fontFamily = fontFamily)
     //ShowColorBoxs()
     //GreetMe()
-    ShowList()
+    //ShowList()
+    ConstraintLayoutSample()
 }
 
 @Composable
-fun ShowList(){
-    LazyColumn{
-        items(5000){
+fun ConstraintLayoutSample() {
+    val context = LocalContext.current
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        // Create references for the composables to constrain
+        val (button, text) = createRefs()
+        Button(
+            onClick = {
+                Toast.makeText(context, "Click", Toast.LENGTH_LONG).show()
+            },
+            // Assign reference "button" to the Button composable
+            // and constrain it to the top of the ConstraintLayout
+            modifier = Modifier
+                .constrainAs(button) {
+                    top.linkTo(parent.top, margin = 16.dp)
+                    start.linkTo(parent.start, margin = 16.dp)
+                },
+        ) {
+            Text(
+                text = "Button"
+            )
+        }
+        // Assign reference "text" to the Text composable
+        // and constrain it to the bottom of the Button composable
+        Text("Text",
+            Modifier.constrainAs(text) {
+                top.linkTo(button.bottom, margin = 16.dp)
+                start.linkTo(parent.start, margin = 16.dp)
+            })
+    }
+}
+
+@Composable
+fun ShowList() {
+    LazyColumn {
+        items(5000) {
             Text(
                 text = "Item $it",
                 fontSize = 24.sp,
@@ -84,7 +124,7 @@ fun ShowList(){
 @Composable
 fun GreetMe() {
     val scaffoldState = rememberScaffoldState()
-    var textFieldState by remember{
+    var textFieldState by remember {
         mutableStateOf("")
     }
     val scope = rememberCoroutineScope()
@@ -105,15 +145,18 @@ fun GreetMe() {
             TextField(
                 value = textFieldState,
                 label = {
-                   Text("Enter your name")
+                    Text("Enter your name")
                 },
                 onValueChange = { it ->
                     textFieldState = it
                 },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                keyboardActions = KeyboardActions(onDone = {focusManager.clearFocus()}),
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done,keyboardType = KeyboardType.Text)
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Text
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
